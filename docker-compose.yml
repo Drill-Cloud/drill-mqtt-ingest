@@ -21,7 +21,3 @@ services:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: "80"
       WS_PORT: "9090"
-    volumes:
-      - ./app:/app
-      # Linux node_modules из образа; без этого bind ./app затирает их win32-бинарниками с хоста
-      - /app/node_modules

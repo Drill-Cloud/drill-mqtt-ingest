@@ -3,11 +3,14 @@ import type { TopicHandler } from '../types.js'
 
 export const TOPIC = 'data/edge5/video/v1'
 
-export const handleEdge5Video: TopicHandler = async (topic, payload) => {
-  console.log('edge5.video.received', {
-    topic,
-    bytes: payload.length,
-    payload,
-  })
+const BEACON_MS = 3000
+let lastBeacon = 0
+
+export const handleEdge5Video: TopicHandler = async (_topic, payload) => {
+  const now = Date.now()
+  if (now - lastBeacon >= BEACON_MS) {
+    console.log(`edge5.video ↑ ${payload.length}B`)
+    lastBeacon = now
+  }
   onEdgeChunk(payload)
 }
