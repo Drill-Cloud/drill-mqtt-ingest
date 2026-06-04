@@ -1,0 +1,27 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  app:
+    build: ./app
+    container_name: mqtt-worker
+    depends_on:
+      - mosquitto
+    ports:
+      - "80:80"
+      - "9090:9090"
+    environment:
+      MQTT_URL: mqtt://mosquitto:1883
+      HTTP_PORT: "80"
+      WS_PORT: "9090"
+    volumes:
+      - ./app:/app
+      # Linux node_modules из образа; без этого bind ./app затирает их win32-бинарниками с хоста
+      - /app/node_modules

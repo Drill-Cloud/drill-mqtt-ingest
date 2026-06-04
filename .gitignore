@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+
+# env & secrets
+.env
+.env.*
+
+# logs
+*.log
+mosquitto/log/*
+!mosquitto/log/.gitkeep
+
+# mosquitto runtime persistence (keep directory)
+mosquitto/data/*
+!mosquitto/data/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
