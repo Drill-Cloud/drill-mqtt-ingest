@@ -21,3 +21,4 @@ services:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: "80"
       WS_PORT: "9090"
+      EDGE5_MODBUS_POST_URL: ${EDGE5_MODBUS_POST_URL:-https://greact.drll.cloud/api/ingest}
