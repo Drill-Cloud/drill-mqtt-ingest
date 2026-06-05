@@ -5,7 +5,7 @@ export const TOPIC = 'data/edge5/modbus/v1'
 const EDGE = 'edge5'
 const REGISTER_COUNT = 125
 const postUrl =
-  process.env.CLOUD_INGEST_URL ?? 'https://greact.drll.cloud/api/ingest'
+  process.env.CLOUD_INGEST_URL ?? 'https://demo.backend.drill.greact.ru/api/ingest'
 
 type Edge5ModbusMetric = {
   edge: string
