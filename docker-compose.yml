@@ -15,7 +15,7 @@ services:
     depends_on:
       - mosquitto
     ports:
-      - "80:80"
+      # - "80:80"
       - "9090:9090"
     environment:
       MQTT_URL: mqtt://mosquitto:1883
