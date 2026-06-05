@@ -31,7 +31,7 @@ services:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: "80"
       WS_PORT: "9090"
-      CLOUD_INGEST_URL: ${CLOUD_INGEST_URL:-https://greact.drll.cloud/api/ingest}
+      CLOUD_INGEST_URL: ${CLOUD_INGEST_URL:-https://demo.backend.drill.greact.ru/api/ingest}
 
 volumes:
   mosquitto_data:
