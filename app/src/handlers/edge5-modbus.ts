@@ -5,7 +5,7 @@ export const TOPIC = 'data/edge5/modbus/v1'
 const EDGE = 'edge5'
 const REGISTER_COUNT = 125
 const postUrl =
-  process.env.EDGE5_MODBUS_POST_URL ?? 'https://greact.drll.cloud/api/ingest'
+  process.env.CLOUD_INGEST_URL ?? 'https://greact.drll.cloud/api/ingest'
 
 type Edge5ModbusMetric = {
   edge: string
@@ -38,7 +38,7 @@ function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
   return values.map((value, index) => ({
     edge: EDGE,
     timestamp,
-    tag: `modbus.${index + 1}`,
+    tag: `${EDGE}.modbus.${index + 1}`,
     value,
   }))
 }
