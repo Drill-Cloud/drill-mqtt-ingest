@@ -1,21 +1,9 @@
 services:
   mosquitto:
-    image: eclipse-mosquitto:2
+    build: ./mosquitto
     container_name: mosquitto
     ports:
       - "1883:1883"
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cat > /tmp/mosquitto.conf <<'EOF'
-        listener 1883
-        allow_anonymous true
-        persistence true
-        persistence_location /mosquitto/data/
-        log_dest stdout
-        EOF
-        exec mosquitto -c /tmp/mosquitto.conf
     volumes:
       - mosquitto_data:/mosquitto/data
 
@@ -31,7 +19,7 @@ services:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: "80"
       WS_PORT: "9090"
-      CLOUD_INGEST_URL: ${CLOUD_INGEST_URL:-https://demo.backend.drill.greact.ru/api/ingest}
+      CLOUD_INGEST_URL: ${CLOUD_INGEST_URL:-https://demo.backend.drill.greact.ru/ingest}
 
 volumes:
   mosquitto_data:

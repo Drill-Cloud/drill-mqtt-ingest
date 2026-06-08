@@ -44,11 +44,6 @@ function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
 }
 
 async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
-  // console.log('edge5.modbus.post_payload', JSON.stringify(metrics))
-  // console.log('edge5.modbus.post_skipped', {
-  //   url: postUrl,
-  //   count: metrics.length,
-  // })
 
   const response = await fetch(postUrl, {
     method: 'POST',
