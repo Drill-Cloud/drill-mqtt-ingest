@@ -1,18 +1,16 @@
+import { createMetricMapper, type MappedMetric } from '../mapping.js'
 import type { TopicHandler } from '../types.js'
 
-export const TOPIC = 'data/edge5/modbus/v1'
+export const TOPIC = 'data/edge5/modbus/v2'
 
-const EDGE = 'edge5'
-const REGISTER_COUNT = 125
+const mapper = createMetricMapper({
+  filePath:
+    process.env.EDGE5_MODBUS_V2_MAPPING_FILE ??
+    new URL('../mappings/edge5-modbus.json', import.meta.url),
+})
+const REGISTER_COUNT = mapper.tagCount
 const postUrl =
   process.env.CLOUD_INGEST_URL ?? 'https://demo.backend.drill.greact.ru/ingest'
-
-type Edge5ModbusMetric = {
-  edge: string
-  timestamp: number
-  tag: string
-  value: number
-}
 
 function parseValues(payload: Buffer): number[] {
   let value: unknown
@@ -34,16 +32,7 @@ function parseValues(payload: Buffer): number[] {
   throw new Error(`Expected JSON number[${REGISTER_COUNT}]`)
 }
 
-function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
-  return values.map((value, index) => ({
-    edge: EDGE,
-    timestamp,
-    tag: `${EDGE}.modbus.${index + 1}`,
-    value,
-  }))
-}
-
-async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
+async function postMetrics(metrics: MappedMetric[]): Promise<void> {
   const response = await fetch(postUrl, {
     method: 'POST',
     headers: {
@@ -54,7 +43,7 @@ async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
 
   if (!response.ok) {
     const text = await response.text()
-    console.error('edge5.modbus.post_error', {
+    console.error('edge5.modbus.v2.post_error', {
       status: response.status,
       statusText: response.statusText,
       body: text.slice(0, 500),
@@ -62,21 +51,21 @@ async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
     return
   }
 
-  console.log('edge5.modbus.posted', { count: metrics.length })
+  console.log('edge5.modbus.v2.posted', { count: metrics.length })
 }
 
-export const handleEdge5Modbus: TopicHandler = async (topic, payload) => {
-  console.log('edge5.modbus.received', { topic, bytes: payload.length })
+export const handleEdge5ModbusV2: TopicHandler = async (topic, payload) => {
+  console.log('edge5.modbus.v2.received', { topic, bytes: payload.length })
 
   let values: number[]
 
   try {
     values = parseValues(payload)
   } catch (err) {
-    console.warn('edge5.modbus.invalid_payload', { topic, err })
+    console.warn('edge5.modbus.v2.invalid_payload', { topic, err })
     return
   }
 
-  const metrics = toMetrics(values, Date.now())
+  const metrics = mapper.mapValues(values, Date.now())
   await postMetrics(metrics)
 }
