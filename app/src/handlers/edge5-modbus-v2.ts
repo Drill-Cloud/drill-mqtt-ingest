@@ -43,12 +43,7 @@ async function postMetrics(metrics: MappedMetric[]): Promise<void> {
 
   if (!response.ok) {
     const text = await response.text()
-    console.error('edge5.modbus.v2.post_error', {
-      status: response.status,
-      statusText: response.statusText,
-      body: text.slice(0, 500),
-    })
-    return
+    throw new Error(text)
   }
 
   console.log('edge5.modbus.v2.posted', { count: metrics.length })
@@ -57,15 +52,7 @@ async function postMetrics(metrics: MappedMetric[]): Promise<void> {
 export const handleEdge5ModbusV2: TopicHandler = async (topic, payload) => {
   console.log('edge5.modbus.v2.received', { topic, bytes: payload.length })
 
-  let values: number[]
-
-  try {
-    values = parseValues(payload)
-  } catch (err) {
-    console.warn('edge5.modbus.v2.invalid_payload', { topic, err })
-    return
-  }
-
+  const values = parseValues(payload)
   const metrics = mapper.mapValues(values, Date.now())
   await postMetrics(metrics)
 }

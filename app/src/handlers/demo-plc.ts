@@ -12,24 +12,11 @@ type DemoPlcPayload = {
   value: number
 }
 
-type DemoPlcMetric = DemoPlcPayload & {
+type DemoPlcMetric = {
   edge: string
   timestamp: number
-}
-
-function isDemoPlcPayload(value: unknown): value is DemoPlcPayload {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-
-  const candidate = value as Partial<DemoPlcPayload>
-
-  return (
-    typeof candidate.tag === 'string' &&
-    candidate.tag.length > 0 &&
-    typeof candidate.value === 'number' &&
-    Number.isFinite(candidate.value)
-  )
+  tag: string
+  value: number
 }
 
 function toMetric(payload: DemoPlcPayload, timestamp: number): DemoPlcMetric {
@@ -52,12 +39,7 @@ async function postMetric(metric: DemoPlcMetric): Promise<void> {
 
   if (!response.ok) {
     const text = await response.text()
-    console.error('demo.plc.post_error', {
-      status: response.status,
-      statusText: response.statusText,
-      body: text.slice(0, 500),
-    })
-    return
+    throw new Error(text)
   }
 
   console.log('demo.plc.posted', { tag: metric.tag })
@@ -66,20 +48,7 @@ async function postMetric(metric: DemoPlcMetric): Promise<void> {
 export const handleDemoPlc: TopicHandler = async (topic, payload) => {
   console.log('demo.plc.received', { topic, bytes: payload.length })
 
-  let value: unknown
-
-  try {
-    value = parseJson(payload)
-  } catch (err) {
-    console.warn('demo.plc.invalid_json', { topic, err })
-    return
-  }
-
-  if (!isDemoPlcPayload(value)) {
-    console.warn('demo.plc.invalid_payload', { topic })
-    return
-  }
-
+  const value = parseJson<DemoPlcPayload>(payload)
   const metric = toMetric(value, Date.now())
   await postMetric(metric)
 }
