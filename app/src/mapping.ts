@@ -7,11 +7,9 @@ export type MappedMetric = {
   value: number
 }
 
-type MappingTagEntry = string | { tag: string } | { key: string }
-
 type MappingConfig = {
   edge: string
-  tags: MappingTagEntry[]
+  tags: string[]
 }
 
 export type MetricMapper = {
@@ -21,8 +19,9 @@ export type MetricMapper = {
 }
 
 type MetricMapperOptions = {
-  // filePath is set as a URL from import.meta.url for bundled mappings,
-  // or as a path string resolved by Node from the process working directory.
+  // filePath contract:
+  // - built-in mappings are passed as URL via new URL('../mappings/*.json', import.meta.url);
+  // - env overrides are expected as absolute paths inside the runtime container.
   filePath: string | URL
 }
 
@@ -32,18 +31,15 @@ function readMappingConfig(filePath: string | URL): MappingConfig {
 
 export function createMetricMapper(options: MetricMapperOptions): MetricMapper {
   const config = readMappingConfig(options.filePath)
-  const tags = config.tags.map((entry) =>
-    typeof entry === 'string' ? entry : 'tag' in entry ? entry.tag : entry.key,
-  )
 
   return {
     edge: config.edge,
-    tagCount: tags.length,
+    tagCount: config.tags.length,
     mapValues: (values, timestamp) =>
       values.map((value, index) => ({
         edge: config.edge,
         timestamp,
-        tag: tags[index],
+        tag: config.tags[index],
         value,
       })),
   }
