@@ -20,6 +20,7 @@ services:
       HTTP_PORT: "80"
       WS_PORT: "9090"
       CLOUD_INGEST_URL: ${CLOUD_INGEST_URL:-https://demo.backend.drill.greact.ru/ingest}
+      CLOUD_INGEST_API_KEY: ${CLOUD_INGEST_API_KEY:-}
       EDGE5_MODBUS_V2_MAPPING_FILE: ${EDGE5_MODBUS_V2_MAPPING_FILE:-/app/src/mappings/edge5-modbus.json}
 
 volumes:

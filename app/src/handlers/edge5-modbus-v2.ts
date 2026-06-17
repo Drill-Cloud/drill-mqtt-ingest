@@ -1,3 +1,4 @@
+import { postCloudIngest } from '../cloud-ingest.js'
 import { createMetricMapper, type MappedMetric } from '../mapping.js'
 import type { TopicHandler } from '../types.js'
 
@@ -9,17 +10,9 @@ const mapper = createMetricMapper({
     new URL('../mappings/edge5-modbus.json', import.meta.url),
 })
 const REGISTER_COUNT = mapper.tagCount
-const postUrl =
-  process.env.CLOUD_INGEST_URL ?? 'https://demo.backend.drill.greact.ru/ingest'
 
 function parseValues(payload: Buffer): number[] {
-  let value: unknown
-
-  try {
-    value = JSON.parse(payload.toString('utf8')) as unknown
-  } catch {
-    throw new Error(`Expected JSON number[${REGISTER_COUNT}]`)
-  }
+  const value = JSON.parse(payload.toString('utf8')) as unknown
 
   if (
     Array.isArray(value) &&
@@ -33,13 +26,7 @@ function parseValues(payload: Buffer): number[] {
 }
 
 async function postMetrics(metrics: MappedMetric[]): Promise<void> {
-  const response = await fetch(postUrl, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(metrics),
-  })
+  const response = await postCloudIngest(metrics)
 
   if (!response.ok) {
     const text = await response.text()
