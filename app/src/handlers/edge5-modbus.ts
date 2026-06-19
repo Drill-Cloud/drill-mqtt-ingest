@@ -1,11 +1,10 @@
+import { postCloudIngest } from '../cloud-ingest.js'
 import type { TopicHandler } from '../types.js'
 
 export const TOPIC = 'data/edge5/modbus/v1'
 
 const EDGE = 'edge5'
 const REGISTER_COUNT = 125
-const postUrl =
-  process.env.CLOUD_INGEST_URL ?? 'https://demo.backend.drill.greact.ru/api/ingest'
 
 type Edge5ModbusMetric = {
   edge: string
@@ -44,14 +43,7 @@ function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
 }
 
 async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
-
-  const response = await fetch(postUrl, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(metrics),
-  })
+  const response = await postCloudIngest(metrics)
 
   if (!response.ok) {
     const text = await response.text()
