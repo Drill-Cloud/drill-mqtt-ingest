@@ -3,10 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --env-file-if-exists=.env ./node_modules/tsx/dist/cli.mjs watch src/index.ts",
-    "start": "node --env-file-if-exists=.env ./node_modules/tsx/dist/cli.mjs src/index.ts",
+    "dev":   "tsx watch --env-file=.env src/index.ts",
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "start": "node --env-file=.env dist/index.js"
   },
   "dependencies": {
     "@types/node": "^25.9.1",
