@@ -4,6 +4,7 @@ import type { TopicHandler } from '../types.js'
 export const TOPIC = 'data/edge5/modbus/v1'
 
 const EDGE = 'edge5'
+const REGISTER_COUNT = 125
 
 type Edge5ModbusMetric = {
   edge: string
@@ -13,7 +14,15 @@ type Edge5ModbusMetric = {
 }
 
 function parseValues(payload: Buffer): number[] {
-  return JSON.parse(payload.toString('utf8')) as number[]
+  const values = JSON.parse(payload.toString('utf8')) as number[]
+  assertRegisterCount(values)
+  return values
+}
+
+function assertRegisterCount(values: number[]): void {
+  if (values.length !== REGISTER_COUNT) {
+    throw new Error(`Expected ${REGISTER_COUNT} modbus values, got ${values.length}`)
+  }
 }
 
 function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {

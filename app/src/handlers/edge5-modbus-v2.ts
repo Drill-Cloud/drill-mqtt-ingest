@@ -4,12 +4,21 @@ import type { TopicHandler } from '../types.js'
 
 export const TOPIC = 'data/edge5/modbus/v2'
 
+const REGISTER_COUNT = 125
 const mapper = createMetricMapper({
   filePath: process.env.EDGE5_MODBUS_V2_MAPPING_FILE as string,
 })
 
 function parseValues(payload: Buffer): number[] {
-  return JSON.parse(payload.toString('utf8')) as number[]
+  const values = JSON.parse(payload.toString('utf8')) as number[]
+  assertRegisterCount(values)
+  return values
+}
+
+function assertRegisterCount(values: number[]): void {
+  if (values.length !== REGISTER_COUNT) {
+    throw new Error(`Expected ${REGISTER_COUNT} modbus values, got ${values.length}`)
+  }
 }
 
 async function postMetrics(metrics: MappedMetric[]): Promise<void> {
