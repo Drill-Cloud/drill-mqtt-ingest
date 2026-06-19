@@ -14,7 +14,6 @@ type MappingConfig = {
 
 export type MetricMapper = {
   edge: string
-  tagCount: number
   mapValues: (values: number[], timestamp: number) => MappedMetric[]
 }
 
@@ -34,7 +33,6 @@ export function createMetricMapper(options: MetricMapperOptions): MetricMapper {
 
   return {
     edge: config.edge,
-    tagCount: config.tags.length,
     mapValues: (values, timestamp) =>
       values.map((value, index) => ({
         edge: config.edge,

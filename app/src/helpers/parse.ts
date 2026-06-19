@@ -7,14 +7,6 @@ export function parseJson<T = unknown>(payload: Buffer): T {
   return JSON.parse(text) as T
 }
 
-export function parseJsonArray(payload: Buffer): unknown[] {
-  const value = parseJson(payload)
-  if (!Array.isArray(value)) {
-    throw new Error('Expected JSON array')
-  }
-  return value
-}
-
 export function decodeBase64(payload: Buffer): Buffer {
   return Buffer.from(payload.toString('utf8'), 'base64')
 }

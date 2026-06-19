@@ -3,7 +3,7 @@ import { createServer } from 'node:http'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const httpPort = Number(process.env.HTTP_PORT ?? 80)
+const httpPort = Number(process.env.HTTP_PORT)
 const publicDir = join(dirname(fileURLToPath(import.meta.url)), '../../public')
 const indexPath = join(publicDir, 'index.html')
 

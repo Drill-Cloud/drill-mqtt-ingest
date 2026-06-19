@@ -1,7 +1,4 @@
-const DEFAULT_CLOUD_INGEST_URL = 'http://localhost:3101/ingest'
-
-export const cloudIngestUrl =
-  process.env.CLOUD_INGEST_URL ?? DEFAULT_CLOUD_INGEST_URL
+export const cloudIngestUrl = process.env.CLOUD_INGEST_URL as string
 
 export function postCloudIngest(body: unknown): Promise<Response> {
   return fetch(cloudIngestUrl, {

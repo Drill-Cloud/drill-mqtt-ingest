@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'http'
 import { WebSocket, WebSocketServer } from 'ws'
 
-const wsPort = Number(process.env.WS_PORT ?? 9090)
+const wsPort = Number(process.env.WS_PORT)
 
 const wss = new WebSocketServer({ port: wsPort, perMessageDeflate: false })
 const clients = new Set<WebSocket>()

@@ -3,7 +3,7 @@ import mqtt from 'mqtt'
 import { getRegisteredTopics } from './registry.js'
 import { routeMessage } from './router.js'
 
-const mqttUrl = process.env.MQTT_URL ?? 'mqtt://localhost:1883'
+const mqttUrl = process.env.MQTT_URL as string
 
 export const mqttClient = mqtt.connect(mqttUrl)
 
