@@ -5,9 +5,7 @@ import type { TopicHandler } from '../types.js'
 export const TOPIC = 'data/edge5/modbus/v2'
 
 const mapper = createMetricMapper({
-  filePath:
-    process.env.EDGE5_MODBUS_V2_MAPPING_FILE ??
-    new URL('../mappings/edge5-modbus.json', import.meta.url),
+  filePath: process.env.EDGE5_MODBUS_V2_MAPPING_FILE as string,
 })
 const REGISTER_COUNT = mapper.tagCount
 

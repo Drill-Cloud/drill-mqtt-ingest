@@ -10,4 +10,4 @@ COPY public ./public
 # Runtime mappers read JSON files from src/mappings, so they must be copied into the image.
 COPY src ./src
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
