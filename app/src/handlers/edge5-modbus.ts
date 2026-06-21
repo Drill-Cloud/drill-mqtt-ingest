@@ -35,11 +35,13 @@ function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
 }
 
 async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
-  const response = await postCloudIngest(metrics)
+  for (const metric of metrics) {
+    const response = await postCloudIngest(metric)
 
-  if (!response.ok) {
-    const text = await response.text()
-    throw new Error(text)
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(text)
+    }
   }
 
   console.log('edge5.modbus.posted', { count: metrics.length })

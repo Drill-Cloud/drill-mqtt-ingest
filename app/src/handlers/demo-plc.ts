@@ -28,7 +28,7 @@ function toMetric(payload: DemoPlcPayload, timestamp: number): DemoPlcMetric {
 }
 
 async function postMetric(metric: DemoPlcMetric): Promise<void> {
-  const response = await postCloudIngest([metric])
+  const response = await postCloudIngest(metric)
 
   if (!response.ok) {
     const text = await response.text()
