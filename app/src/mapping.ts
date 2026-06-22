@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 
 export type MappedMetric = {
   edge: string
-  timestamp: number
+  timestamp: string
   tag: string
   value: number
 }
@@ -14,7 +14,7 @@ type MappingConfig = {
 
 export type MetricMapper = {
   edge: string
-  mapValues: (values: number[], timestamp: number) => MappedMetric[]
+  mapValues: (values: number[], timestamp: string) => MappedMetric[]
 }
 
 type MetricMapperOptions = {
