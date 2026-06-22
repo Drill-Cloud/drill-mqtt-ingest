@@ -54,6 +54,6 @@ export const handleEdge5ModbusV2: TopicHandler = async (topic, payload) => {
   console.log('edge5.modbus.v2.received', { topic, bytes: payload.length })
 
   const values = parseValues(payload)
-  const metrics = mapper.mapValues(values, Date.now())
+  const metrics = mapper.mapValues(values, new Date().toISOString())
   await postMetrics(metrics)
 }

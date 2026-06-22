@@ -8,7 +8,7 @@ const REGISTER_COUNT = 125
 
 type Edge5ModbusMetric = {
   edge: string
-  timestamp: number
+  timestamp: string
   tag: string
   value: number
 }
@@ -25,7 +25,7 @@ function assertRegisterCount(values: number[]): void {
   }
 }
 
-function toMetrics(values: number[], timestamp: number): Edge5ModbusMetric[] {
+function toMetrics(values: number[], timestamp: string): Edge5ModbusMetric[] {
   return values.map((value, index) => ({
     edge: EDGE,
     timestamp,
@@ -51,6 +51,6 @@ export const handleEdge5Modbus: TopicHandler = async (topic, payload) => {
   console.log('edge5.modbus.received', { topic, bytes: payload.length })
 
   const values = parseValues(payload)
-  const metrics = toMetrics(values, Date.now())
+  const metrics = toMetrics(values, new Date().toISOString())
   await postMetrics(metrics)
 }

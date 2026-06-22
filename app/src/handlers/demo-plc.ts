@@ -13,12 +13,12 @@ type DemoPlcPayload = {
 
 type DemoPlcMetric = {
   edge: string
-  timestamp: number
+  timestamp: string
   tag: string
   value: number
 }
 
-function toMetric(payload: DemoPlcPayload, timestamp: number): DemoPlcMetric {
+function toMetric(payload: DemoPlcPayload, timestamp: string): DemoPlcMetric {
   return {
     edge: EDGE,
     timestamp,
@@ -42,6 +42,6 @@ export const handleDemoPlc: TopicHandler = async (topic, payload) => {
   console.log('demo.plc.received', { topic, bytes: payload.length })
 
   const value = parseJson<DemoPlcPayload>(payload)
-  const metric = toMetric(value, Date.now())
+  const metric = toMetric(value, new Date().toISOString())
   await postMetric(metric)
 }
