@@ -2,9 +2,8 @@ import { postCloudIngest } from '../cloud-ingest.js'
 import { createMetricMapper, type MappedMetric } from '../mapping.js'
 import type { TopicHandler } from '../types.js'
 
-export const TOPIC = 'data/edge5/modbus/v2'
-
 const REGISTER_COUNT = 125
+
 const mapper = createMetricMapper({
   filePath: process.env.EDGE5_MODBUS_V2_MAPPING_FILE as string,
 })

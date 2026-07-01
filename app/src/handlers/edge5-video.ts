@@ -1,8 +1,6 @@
 import { onEdgeChunk } from '../stream/edge-chunk-relay.js'
 import type { TopicHandler } from '../types.js'
 
-export const TOPIC = 'data/edge5/video/v1'
-
 const BEACON_MS = 3000
 let lastBeacon = 0
 

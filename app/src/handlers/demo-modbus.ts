@@ -1,12 +1,10 @@
 import { postCloudIngest } from '../cloud-ingest.js'
 import type { TopicHandler } from '../types.js'
 
-export const TOPIC = 'data/edge5/modbus/v1'
-
-const EDGE = 'edge5'
+const EDGE = 'demo'
 const REGISTER_COUNT = 125
 
-type Edge5ModbusMetric = {
+type DemoModbusMetric = {
   edge: string
   timestamp: string
   tag: string
@@ -25,7 +23,7 @@ function assertRegisterCount(values: number[]): void {
   }
 }
 
-function toMetrics(values: number[], timestamp: string): Edge5ModbusMetric[] {
+function toMetrics(values: number[], timestamp: string): DemoModbusMetric[] {
   return values.map((value, index) => ({
     edge: EDGE,
     timestamp,
@@ -34,7 +32,7 @@ function toMetrics(values: number[], timestamp: string): Edge5ModbusMetric[] {
   }))
 }
 
-async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
+async function postMetrics(metrics: DemoModbusMetric[]): Promise<void> {
   for (const metric of metrics) {
     const response = await postCloudIngest(metric)
 
@@ -47,7 +45,7 @@ async function postMetrics(metrics: Edge5ModbusMetric[]): Promise<void> {
   console.log('edge5.modbus.posted', { count: metrics.length })
 }
 
-export const handleEdge5Modbus: TopicHandler = async (topic, payload) => {
+export const handleDemoModbus: TopicHandler = async (topic, payload) => {
   console.log('edge5.modbus.received', { topic, bytes: payload.length })
 
   const values = parseValues(payload)

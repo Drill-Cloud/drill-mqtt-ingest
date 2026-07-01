@@ -2,8 +2,6 @@ import { postCloudIngest } from '../cloud-ingest.js'
 import { parseJson } from '../helpers/parse.js'
 import type { TopicHandler } from '../types.js'
 
-export const TOPIC = 'data/demo/plc/v1'
-
 const EDGE = 'demo'
 
 type DemoPlcPayload = {

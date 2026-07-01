@@ -1,13 +1,16 @@
 import { register } from '../registry.js'
-import { handleDemoPlc, TOPIC as demoPlc } from './demo-plc.js'
-import { handleEdge5Modbus, TOPIC as edge5Modbus } from './edge5-modbus.js'
-import {
-  handleEdge5ModbusV2,
-  TOPIC as edge5ModbusV2,
-} from './edge5-modbus-v2.js'
-import { handleEdge5Video, TOPIC as edge5Video } from './edge5-video.js'
 
-register(demoPlc, handleDemoPlc)
-register(edge5Modbus, handleEdge5Modbus)
-register(edge5ModbusV2, handleEdge5ModbusV2)
-register(edge5Video, handleEdge5Video)
+import { handleDemoPlc } from './demo-plc.js'
+import { handleDemoModbus } from './demo-modbus.js'
+import { handleEdge5ModbusV2 } from './edge5-modbus-v2.js'
+import { handleEdge5Video } from './edge5-video.js'
+
+const DEMO_PLC_TOPIC = 'data/demo/plc/v1'
+const DEMO_MODBUS_TOPIC = 'data/demo/modbus/v1'
+const EDGE5_MODBUS_TOPIC = 'data/edge5/modbus/v2'
+const EDGE5_VIDEO_TOPIC = 'data/edge5/video/v1'
+
+register(DEMO_PLC_TOPIC, handleDemoPlc)
+register(DEMO_MODBUS_TOPIC, handleDemoModbus)
+register(EDGE5_MODBUS_TOPIC, handleEdge5ModbusV2)
+register(EDGE5_VIDEO_TOPIC, handleEdge5Video)
