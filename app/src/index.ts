@@ -3,4 +3,6 @@ import './http/server.js'
 import './mqtt.js'
 import './stream/edge-chunk-relay.js'
 
-console.log('mqtt-worker.started')
+import { log } from './helpers/log.js'
+
+log('mqtt-worker.started')

@@ -1,4 +1,5 @@
 import { postCloudIngest } from '../cloud-ingest.js'
+import { log } from '../helpers/log.js'
 import { parseJson } from '../helpers/parse.js'
 import type { TopicHandler } from '../types.js'
 
@@ -33,11 +34,11 @@ async function postMetric(metric: DemoPlcMetric): Promise<void> {
     throw new Error(text)
   }
 
-  console.log('demo.plc.posted', { tag: metric.tag })
+  log('demo.plc.posted', { tag: metric.tag })
 }
 
 export const handleDemoPlc: TopicHandler = async (topic, payload) => {
-  console.log('demo.plc.received', { topic, bytes: payload.length })
+  log('demo.plc.received', { topic, bytes: payload.length })
 
   const value = parseJson<DemoPlcPayload>(payload)
   const metric = toMetric(value, new Date().toISOString())

@@ -3,6 +3,8 @@ import { createServer } from 'node:http'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { log } from '../helpers/log.js'
+
 const httpPort = Number(process.env.HTTP_PORT)
 const publicDir = join(dirname(fileURLToPath(import.meta.url)), '../../public')
 const indexPath = join(publicDir, 'index.html')
@@ -24,5 +26,5 @@ createServer(async (req, res) => {
 
   res.writeHead(404).end('Not Found')
 }).listen(httpPort, () => {
-  console.log('http.server_started', { port: httpPort })
+  log('http.server_started', { port: httpPort })
 })

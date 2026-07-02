@@ -2,14 +2,21 @@ import { postCloudIngest } from '../cloud-ingest.js'
 import { log } from '../helpers/log.js'
 import type { TopicHandler } from '../types.js'
 
-const EDGE = 'demo'
-const REGISTER_COUNT = 125
+const EDGE = 'edge5cdab'
+const REGISTER_COUNT = 100
 
-type DemoModbusMetric = {
+type Edge5iiModbusMetric = {
   edge: string
   timestamp: string
   tag: string
   value: number
+}
+
+function toFloatCDAB(reg0: number, reg1: number): number {
+  const buf = Buffer.allocUnsafe(4)
+  buf.writeUInt16BE(reg1, 0)
+  buf.writeUInt16BE(reg0, 2)
+  return buf.readFloatBE(0)
 }
 
 function parseValues(payload: Buffer): number[] {
@@ -24,16 +31,22 @@ function assertRegisterCount(values: number[]): void {
   }
 }
 
-function toMetrics(values: number[], timestamp: string): DemoModbusMetric[] {
-  return values.map((value, index) => ({
-    edge: EDGE,
-    timestamp,
-    tag: `register-${index}`,
-    value,
-  }))
+function toMetrics(values: number[], timestamp: string): Edge5iiModbusMetric[] {
+  const metrics: Edge5iiModbusMetric[] = []
+
+  for (let i = 0; i < values.length; i += 2) {
+    metrics.push({
+      edge: EDGE,
+      timestamp,
+      tag: `register-${String(i).padStart(3, '0')}`,
+      value: toFloatCDAB(values[i], values[i + 1]),
+    })
+  }
+
+  return metrics
 }
 
-async function postMetrics(metrics: DemoModbusMetric[]): Promise<void> {
+async function postMetrics(metrics: Edge5iiModbusMetric[]): Promise<void> {
   for (const metric of metrics) {
     const response = await postCloudIngest(metric)
 
@@ -46,7 +59,7 @@ async function postMetrics(metrics: DemoModbusMetric[]): Promise<void> {
   log(`${EDGE}.modbus.posted ${metrics.length} metrics`)
 }
 
-export const handleDemoModbus: TopicHandler = async (topic, payload) => {
+export const handle: TopicHandler = async (topic, payload) => {
   log(`${EDGE}.modbus.received ${topic} ${payload.length} bytes`)
 
   const values = parseValues(payload)

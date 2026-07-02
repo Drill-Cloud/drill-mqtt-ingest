@@ -1,4 +1,5 @@
 import { postCloudIngest } from '../cloud-ingest.js'
+import { log } from '../helpers/log.js'
 import { createMetricMapper, type MappedMetric } from '../mapping.js'
 import type { TopicHandler } from '../types.js'
 
@@ -38,7 +39,7 @@ async function postMetrics(metrics: MappedMetric[]): Promise<void> {
     }
   }
 
-  console.log('edge5.modbus.v2.posted', {
+  log('edge5.modbus.v2.posted', {
     total: metrics.length,
     succeeded: metrics.length - errors.length,
     failed: errors.length,
@@ -50,7 +51,7 @@ async function postMetrics(metrics: MappedMetric[]): Promise<void> {
 }
 
 export const handleEdge5ModbusV2: TopicHandler = async (topic, payload) => {
-  console.log('edge5.modbus.v2.received', { topic, bytes: payload.length })
+  log('edge5.modbus.v2.received', { topic, bytes: payload.length })
 
   const values = parseValues(payload)
   const metrics = mapper.mapValues(values, new Date().toISOString())

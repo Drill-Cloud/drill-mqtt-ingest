@@ -1,5 +1,6 @@
 import mqtt from 'mqtt'
 
+import { log } from './helpers/log.js'
 import { getRegisteredTopics } from './registry.js'
 import { routeMessage } from './router.js'
 
@@ -8,7 +9,7 @@ const mqttUrl = process.env.MQTT_URL as string
 export const mqttClient = mqtt.connect(mqttUrl)
 
 mqttClient.on('connect', () => {
-  console.log('mqtt.connected', { url: mqttUrl })
+  log('mqtt.connected', { url: mqttUrl })
 
   const topics = getRegisteredTopics()
   if (topics.length === 0) {
@@ -21,7 +22,7 @@ mqttClient.on('connect', () => {
       console.error('mqtt.subscribe_error', err)
       return
     }
-    console.log('mqtt.subscribed', { topics })
+    log('mqtt.subscribed', { topics })
   })
 })
 
@@ -34,5 +35,5 @@ mqttClient.on('error', (err) => {
 })
 
 mqttClient.on('reconnect', () => {
-  console.log('mqtt.reconnect')
+  log('mqtt.reconnect')
 })
