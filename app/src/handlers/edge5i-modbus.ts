@@ -1,8 +1,8 @@
 import { postCloudIngest } from '../cloud-ingest.js'
 import type { TopicHandler } from '../types.js'
 
-const EDGE = 'demo'
-const REGISTER_COUNT = 125
+const EDGE = 'edge5i'
+const REGISTER_COUNT = 100
 
 type DemoModbusMetric = {
   edge: string
@@ -45,7 +45,7 @@ async function postMetrics(metrics: DemoModbusMetric[]): Promise<void> {
   console.log(`${EDGE}.modbus.posted ${metrics.length} metrics`)
 }
 
-export const handleDemoModbus: TopicHandler = async (topic, payload) => {
+export const handle: TopicHandler = async (topic, payload) => {
   console.log(`${EDGE}.modbus.received ${topic} ${payload.length} bytes`)
 
   const values = parseValues(payload)
