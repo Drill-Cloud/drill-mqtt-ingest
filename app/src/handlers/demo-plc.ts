@@ -1,10 +1,10 @@
+import { postCloudIngest } from '../cloud-ingest.js'
 import { parseJson } from '../helpers/parse.js'
 import type { TopicHandler } from '../types.js'
 
 export const TOPIC = 'data/demo/plc/v1'
 
 const EDGE = 'demo'
-const DEMO_CLOUD_INGEST_URL = process.env.DEMO_CLOUD_INGEST_URL
 
 type DemoPlcPayload = {
   tag: string
@@ -28,14 +28,7 @@ function toMetric(payload: DemoPlcPayload, timestamp: string): DemoPlcMetric {
 }
 
 async function postMetric(metric: DemoPlcMetric): Promise<void> {
-  const response = await fetch(DEMO_CLOUD_INGEST_URL as string, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': process.env.CLOUD_INGEST_API_KEY as string,
-    },
-    body: JSON.stringify(metric),
-  })
+  const response = await postCloudIngest(metric)
 
   if (!response.ok) {
     const text = await response.text()
