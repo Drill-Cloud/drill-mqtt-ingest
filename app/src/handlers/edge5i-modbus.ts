@@ -27,7 +27,7 @@ function toMetrics(values: number[], timestamp: string): DemoModbusMetric[] {
   return values.map((value, index) => ({
     edge: EDGE,
     timestamp,
-    tag: `register-${index}`,
+    tag: `register-${String(index).padStart(3, '0')}`,
     value,
   }))
 }
