@@ -4,9 +4,13 @@
   <meta charset="utf-8" />
   <title>edge5 video relay</title>
   <script src="https://cdn.jsdelivr.net/npm/mpegts.js/dist/mpegts.js"></script>
+  <style>
+    body { margin: 0; background: #000; }
+    #v { display: block; width: 100vw; height: 100vh; object-fit: contain; }
+  </style>
 </head>
 <body>
-  <video id="v" controls autoplay muted style="width:100%"></video>
+  <video id="v" controls autoplay muted></video>
   <script>
     const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
     const player = mpegts.createPlayer(
