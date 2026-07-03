@@ -1,9 +1,9 @@
-import { postCloudIngest } from '../cloud-ingest.js'
 import { log } from '../helpers/log.js'
 import type { TopicHandler } from '../types.js'
 
 const EDGE = 'demo'
 const REGISTER_COUNT = 125
+const DEMO_CLOUD_INGEST_URL = process.env.DEMO_CLOUD_INGEST_URL as string
 
 type DemoModbusMetric = {
   edge: string
@@ -35,7 +35,14 @@ function toMetrics(values: number[], timestamp: string): DemoModbusMetric[] {
 
 async function postMetrics(metrics: DemoModbusMetric[]): Promise<void> {
   for (const metric of metrics) {
-    const response = await postCloudIngest(metric)
+    const response = await fetch(DEMO_CLOUD_INGEST_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': process.env.CLOUD_INGEST_API_KEY as string,
+      },
+      body: JSON.stringify(metric),
+    })
 
     if (!response.ok) {
       const text = await response.text()
