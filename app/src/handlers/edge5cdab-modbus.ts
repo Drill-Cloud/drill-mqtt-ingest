@@ -75,6 +75,5 @@ export const handle: TopicHandler = async (topic, payload) => {
 
   const values = parseValues(payload)
   const metrics = toMetrics(values, timestamp);
-  log(`${EDGE}.modbus.prepared ${JSON.stringify(metrics)}`)
   await postMetrics(metrics)
 }
