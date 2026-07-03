@@ -10,7 +10,7 @@ type Edge5iiModbusMetric = {
   timestamp: string
   tag: string
   value: number
-}
+};
 
 function toFloatCDAB(reg0: number, reg1: number): number {
   const buf = Buffer.allocUnsafe(4)
@@ -64,5 +64,6 @@ export const handle: TopicHandler = async (topic, payload) => {
 
   const values = parseValues(payload)
   const metrics = toMetrics(values, new Date().toISOString())
+  log(`${EDGE}.modbus.prepared ${JSON.stringify(metrics)}`)
   await postMetrics(metrics)
 }
