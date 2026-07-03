@@ -8,7 +8,7 @@
 <body>
   <video id="v" controls autoplay muted style="width:100%"></video>
   <script>
-    const wsUrl = `ws://${location.hostname}:9090`
+    const wsUrl = `ws://194.36.208.86:9090` // TODO use custom domain name
     const player = mpegts.createPlayer(
       { type: 'mpegts', isLive: true, url: wsUrl },
       { liveBufferLatencyChasing: true, liveBufferLatencyMaxLatency: 1.5 }
