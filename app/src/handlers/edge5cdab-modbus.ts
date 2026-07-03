@@ -35,11 +35,21 @@ function toMetrics(values: number[], timestamp: string): Edge5iiModbusMetric[] {
   const metrics: Edge5iiModbusMetric[] = []
 
   for (let i = 0; i < values.length; i += 2) {
+    const tag = `register-${String(i).padStart(3, '0')}`
+    const value = toFloatCDAB(values[i], values[i + 1])
+    if (isNaN(value)) {
+      log(
+        `${EDGE}.modbus: не удалось собрать число для ${tag}, ` +
+          `исходные values[${i}]=${values[i]}, values[${i + 1}]=${values[i + 1]}, пропуск`,
+      )
+      continue
+    };
+
     metrics.push({
       edge: EDGE,
       timestamp,
-      tag: `register-${String(i).padStart(3, '0')}`,
-      value: toFloatCDAB(values[i], values[i + 1]),
+      tag,
+      value,
     })
   }
 
@@ -60,10 +70,11 @@ async function postMetrics(metrics: Edge5iiModbusMetric[]): Promise<void> {
 }
 
 export const handle: TopicHandler = async (topic, payload) => {
+  const timestamp = new Date().toISOString()
   log(`${EDGE}.modbus.received ${topic} ${payload.length} bytes`)
 
   const values = parseValues(payload)
-  const metrics = toMetrics(values, new Date().toISOString())
+  const metrics = toMetrics(values, timestamp);
   log(`${EDGE}.modbus.prepared ${JSON.stringify(metrics)}`)
   await postMetrics(metrics)
 }
