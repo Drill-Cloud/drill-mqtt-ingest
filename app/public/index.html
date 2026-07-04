@@ -15,9 +15,29 @@
     const cameraId = new URLSearchParams(location.search).get('camera') ?? 'v1';
     const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${cameraId}`;
     const player = mpegts.createPlayer(
-      { type: 'mpegts', isLive: true, url: wsUrl },
-      { liveBufferLatencyChasing: true, liveBufferLatencyMaxLatency: 1.5 }
-    )
+      { type: 'mpegts', isLive: true, url: wsUrl, hasAudio: false },
+      {
+        enableWorker: true,              // transmuxing в отдельном треде
+        enableStashBuffer: false,        // без IO-stash для real-time
+        autoCleanupSourceBuffer: true,   // не копить старые буферы в MSE
+        autoCleanupMaxBackwardDuration: 10,
+        autoCleanupMinBackwardDuration: 5,
+
+        // liveSync — плавное догоняние через playbackRate, а не жёсткий seek
+        liveSync: true,
+        liveSyncMaxLatency: 3.0,         // при плохом интернете даём 3с
+        liveSyncTargetLatency: 1.5,      // target после выравнивания
+        liveSyncPlaybackRate: 1.2,       // ускорение не более 1.2x
+
+        // liveBufferLatencyChasing оставляем, но увеличиваем окно
+        liveBufferLatencyChasing: true,
+        liveBufferLatencyMaxLatency: 3.0,
+        liveBufferLatencyMinRemain: 0.5,
+
+        lazyLoad: false,
+        deferLoadAfterSourceOpen: false,
+      }
+    );
     player.attachMediaElement(document.getElementById('v'))
     player.load()
     player.play()
