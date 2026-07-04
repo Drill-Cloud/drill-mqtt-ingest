@@ -12,7 +12,8 @@
 <body>
   <video id="v" controls autoplay muted></video>
   <script>
-    const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
+    const cameraId = new URLSearchParams(location.search).get('camera') ?? 'v1';
+    const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${cameraId}`;
     const player = mpegts.createPlayer(
       { type: 'mpegts', isLive: true, url: wsUrl },
       { liveBufferLatencyChasing: true, liveBufferLatencyMaxLatency: 1.5 }

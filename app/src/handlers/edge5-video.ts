@@ -11,5 +11,5 @@ export const handleEdge5Video: TopicHandler = async (_topic, payload) => {
     log(`edge5.video ↑ ${payload.length}B`)
     lastLog = now
   }
-  onEdgeChunk(payload)
+  onEdgeChunk('v1', payload);
 }
