@@ -22,7 +22,8 @@ services:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: 80 # http port for video previewiong page
       WS_PORT: 9090 # WebSocket port for video streaming
-      WS_PIPE_PORT: 9091 # WebSocket port for incoming and outgoing binary data
+      WS_PIPE_PORT: 9091 # WebSocket port for outgoing binary data
+      HTTP_INGEST_PORT: 9092 # HTTP port for incoming binary data
       CLOUD_INGEST_URL: ${CLOUD_INGEST_URL}
       CLOUD_INGEST_API_KEY: ${CLOUD_INGEST_API_KEY}
       DEMO_CLOUD_INGEST_URL: ${DEMO_CLOUD_INGEST_URL}
