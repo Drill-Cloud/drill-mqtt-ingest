@@ -1,15 +1,16 @@
 import type { IncomingMessage } from 'http'
+import { createServer } from 'http'
 import { WebSocket, WebSocketServer } from 'ws'
 
 import { log } from '../helpers/log.js'
 import { lastTopicSegment } from '../helpers/topic-match.js'
 
 const wsPipePort = Number(process.env.WS_PIPE_PORT)
+const httpIngestPort = Number(process.env.HTTP_INGEST_PORT) // новый порт, например 3456
 const LOG_INTERVAL_MS = 10_000
 
 const wss = new WebSocketServer({ port: wsPipePort, perMessageDeflate: false })
 
-const producersByChannel = new Map<string, WebSocket>()
 const viewersByChannel = new Map<string, Set<WebSocket>>()
 const lastLogByChannel = new Map<string, number>()
 
@@ -41,26 +42,37 @@ function logThroughput(channel: string, bytes: number): void {
   }
 }
 
-function handleProducer(ws: WebSocket, channel: string): void {
-  const existing = producersByChannel.get(channel)
-  if (existing?.readyState === WebSocket.OPEN) {
-    existing.close(1000, 'replaced')
-  }
-  producersByChannel.set(channel, ws)
+// --- HTTP ingest ---
+const httpIngest = createServer((req: IncomingMessage, res) => {
+  const path = req.url?.split('?')[0] ?? ''
 
-  ws.on('message', (data, isBinary) => {
-    if (!isBinary) return
-    const chunk = Buffer.isBuffer(data) ? data : Buffer.from(data as ArrayBuffer)
+  if (!path.startsWith('/in/')) {
+    res.writeHead(404).end()
+    return
+  }
+
+  const channel = lastTopicSegment(path)
+  log(`pipe.in.http_connected [${channel}]`)
+
+  req.on('data', (chunk: Buffer) => {
     logThroughput(channel, chunk.length)
     broadcast(channel, chunk)
   })
 
-  ws.on('close', () => {
-    if (producersByChannel.get(channel) === ws) {
-      producersByChannel.delete(channel)
-    }
+  req.on('end', () => {
+    log(`pipe.in.http_disconnected [${channel}]`)
+    res.writeHead(200).end()
   })
-}
+
+  req.on('error', (err) => {
+    log(`pipe.in.http_error [${channel}]`, err)
+    res.writeHead(500).end()
+  })
+})
+
+httpIngest.listen(httpIngestPort, () => {
+  log('pipe.http_ingest_started', { port: httpIngestPort })
+})
 
 function handleViewer(ws: WebSocket, channel: string, path: string): void {
   log(`pipe.out.connection ${path}`)
@@ -75,11 +87,6 @@ function handleViewer(ws: WebSocket, channel: string, path: string): void {
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   const path = req.url?.split('?')[0] ?? ''
-
-  if (path.startsWith('/in/')) {
-    handleProducer(ws, lastTopicSegment(path))
-    return
-  }
 
   if (path.startsWith('/out/')) {
     handleViewer(ws, lastTopicSegment(path), path)
