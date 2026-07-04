@@ -18,6 +18,7 @@ services:
       - 80 
       - 9090 
       - 9091
+      - 9092
     environment:
       MQTT_URL: mqtt://mosquitto:1883
       HTTP_PORT: 80 # http port for video previewiong page
