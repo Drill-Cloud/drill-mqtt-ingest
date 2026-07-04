@@ -17,22 +17,21 @@
     const player = mpegts.createPlayer(
       { type: 'mpegts', isLive: true, url: wsUrl, hasAudio: false },
       {
-        enableWorker: true,              // transmuxing в отдельном треде
-        enableStashBuffer: false,        // без IO-stash для real-time
-        autoCleanupSourceBuffer: true,   // не копить старые буферы в MSE
+        enableWorker: true,             // transmuxing в отдельном треде
+        enableStashBuffer: true,        // включить stash
+        stashInitialSize: 384,
+
+        autoCleanupSourceBuffer: true,  // не копить старые буферы в MSE
         autoCleanupMaxBackwardDuration: 10,
         autoCleanupMinBackwardDuration: 5,
 
         // liveSync — плавное догоняние через playbackRate, а не жёсткий seek
         liveSync: true,
-        liveSyncMaxLatency: 3.0,         // при плохом интернете даём 3с
-        liveSyncTargetLatency: 1.5,      // target после выравнивания
-        liveSyncPlaybackRate: 1.2,       // ускорение не более 1.2x
+        liveSyncTargetLatency: 4.0,    // target после выравнивания ← дать буферу вырасти
+        liveSyncMaxLatency: 10.0,      // при плохом интернете даём 10с ← не трогать буфер до 10s
+        liveSyncPlaybackRate: 1.05,    // ускорение не более 1.2x ← очень мягкое догоняние
 
-        // liveBufferLatencyChasing оставляем, но увеличиваем окно
-        liveBufferLatencyChasing: true,
-        liveBufferLatencyMaxLatency: 3.0,
-        liveBufferLatencyMinRemain: 0.5,
+        liveBufferLatencyChasing: false,  // включить stash ← убрать конфликтующий механизм
 
         lazyLoad: false,
         deferLoadAfterSourceOpen: false,
