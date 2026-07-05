@@ -3,6 +3,7 @@ import { register } from '../registry.js';
 import { handleDemoPlc } from './demo-plc.js';
 import { handleDemoModbus } from './demo-modbus.js';
 import { handleEdge5ModbusV2 } from './edge5-modbus-v2.js';
+import { handleEdge5ModbusV3 } from './edge5-modbus-v3.js';
 import { handleEdge5Video } from './edge5-video.js';
 import { handleEdge5VideoV2 } from './edge5-video-v2.js';
 
@@ -22,3 +23,4 @@ register(EDGE5_VIDEO_TOPIC, handleEdge5Video);
 register('data/edge5i/modbus', interpretation);
 register('data/edge5cdab/modbus', cdab);
 register('data/edge5/video/v2/+', handleEdge5VideoV2);
+register('data/edge5/modbus/v3', handleEdge5ModbusV3);
