@@ -1,3 +1,6 @@
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { postCloudIngest } from '../cloud-ingest.js'
 import { log } from '../helpers/log.js'
 import { createMetricMapper, type MappedMetric } from '../mapping.js'
@@ -5,8 +8,13 @@ import type { TopicHandler } from '../types.js'
 
 const REGISTER_COUNT = 125
 
+const defaultMappingFile = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../assets/edge5-modbus.json',
+)
+
 const mapper = createMetricMapper({
-  filePath: process.env.EDGE5_MODBUS_V2_MAPPING_FILE as string,
+  filePath: process.env.EDGE5_MODBUS_V2_MAPPING_FILE ?? defaultMappingFile,
 })
 
 function parseValues(payload: Buffer): number[] {

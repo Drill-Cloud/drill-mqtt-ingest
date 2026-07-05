@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 import { log } from '../helpers/log.js'
 
 const httpPort = Number(process.env.HTTP_PORT)
-const publicDir = join(dirname(fileURLToPath(import.meta.url)), '../../public')
-const indexPath = join(publicDir, 'index.html')
+const assetsDir = join(dirname(fileURLToPath(import.meta.url)), '../../assets')
+const indexPath = join(assetsDir, 'index.html')
 
 createServer(async (req, res) => {
   const path = req.url?.split('?')[0]

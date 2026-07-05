@@ -19,7 +19,7 @@ export type MetricMapper = {
 
 type MetricMapperOptions = {
   // filePath contract:
-  // - built-in mappings are passed as URL via new URL('../mappings/*.json', import.meta.url);
+  // - built-in mappings live in app/assets/*.json (resolved relative to dist/ at runtime);
   // - env overrides are expected as absolute paths inside the runtime container.
   filePath: string | URL
 }
