@@ -104,7 +104,7 @@ async function postMetrics(metrics: Edge5ModbusV3Metric[]): Promise<void> {
     }
   }
 
-  log('edge5.modbus.v3.posted', { total: toPost.length });
+  log(`edge5.modbus.v3.data ↑ ${toPost.length} tags`);
 
   if (errors.length) {
     throw new Error(`Failed to post ${errors.length}/${toPost.length} edge5 modbus v3 metrics`)
@@ -113,8 +113,6 @@ async function postMetrics(metrics: Edge5ModbusV3Metric[]): Promise<void> {
 
 export const handleEdge5ModbusV3: TopicHandler = async (topic, payload) => {
   const timestamp = new Date().toISOString();
-  log('edge5.modbus.v3.received', { topic, bytes: payload.length, timestamp })
-
   const values = parseValues(payload);
   const metrics = toMetrics(values, timestamp);
   await postMetrics(metrics);
