@@ -21,6 +21,7 @@ function getClients(cameraId: string): Set<WebSocket> {
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   log(`ws.connection ${req.url}`);
+  req.socket.setNoDelay(true)
   const cameraId = req.url ? lastTopicSegment(req.url) : 'v1';
 
   const clients = getClients(cameraId);

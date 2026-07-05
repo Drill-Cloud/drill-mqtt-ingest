@@ -87,6 +87,7 @@ function handleViewer(ws: WebSocket, channel: string, path: string): void {
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   const path = req.url?.split('?')[0] ?? ''
+  req.socket.setNoDelay(true);
 
   if (path.startsWith('/out/')) {
     handleViewer(ws, lastTopicSegment(path), path)

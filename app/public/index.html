@@ -16,26 +16,6 @@
     const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${cameraId}`;
     const player = mpegts.createPlayer(
       { type: 'mpegts', isLive: true, url: wsUrl, hasAudio: false },
-      {
-        enableWorker: true,             // transmuxing в отдельном треде
-        enableStashBuffer: true,        // включить stash
-        stashInitialSize: 384,
-
-        autoCleanupSourceBuffer: true,  // не копить старые буферы в MSE
-        autoCleanupMaxBackwardDuration: 10,
-        autoCleanupMinBackwardDuration: 5,
-
-        // liveSync — плавное догоняние через playbackRate, а не жёсткий seek
-        liveSync: true,
-        liveSyncTargetLatency: 4.0,    // target после выравнивания ← дать буферу вырасти
-        liveSyncMaxLatency: 10.0,      // при плохом интернете даём 10с ← не трогать буфер до 10s
-        liveSyncPlaybackRate: 1.05,    // ускорение не более 1.2x ← очень мягкое догоняние
-
-        liveBufferLatencyChasing: false,  // включить stash ← убрать конфликтующий механизм
-
-        lazyLoad: false,
-        deferLoadAfterSourceOpen: false,
-      }
     );
     player.attachMediaElement(document.getElementById('v'))
     player.load()

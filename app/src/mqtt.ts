@@ -6,7 +6,12 @@ import { routeMessage } from './router.js'
 
 const mqttUrl = process.env.MQTT_URL as string
 
-export const mqttClient = mqtt.connect(mqttUrl)
+export const mqttClient = mqtt.connect(mqttUrl, {
+  clean: true,
+  queueQoSZero: false,
+  reconnectPeriod: 1000,
+  connectTimeout: 10000,
+});
 
 mqttClient.on('connect', () => {
   log('mqtt.connected', { url: mqttUrl })
