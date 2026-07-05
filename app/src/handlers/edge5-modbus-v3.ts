@@ -1,4 +1,4 @@
-import { postCloudIngest } from '../cloud-ingest.js'
+import { postCloudIngest, postDemoCloudIngest } from '../cloud-ingest.js'
 import { log } from '../helpers/log.js'
 import type { TopicHandler } from '../types.js'
 
@@ -97,6 +97,9 @@ async function postMetrics(metrics: Edge5ModbusV3Metric[]): Promise<void> {
         const text = await response.text()
         throw new Error(text || `${response.status} ${response.statusText}`)
       }
+
+      void postDemoCloudIngest(metric); // для демо-системы
+
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       errors.push(new Error(`${metric.tag}: ${message}`))
