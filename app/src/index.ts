@@ -1,3 +1,4 @@
+import './process-errors.js'
 import './handlers/index.js'
 import './http/server.js'
 import './mqtt.js'
