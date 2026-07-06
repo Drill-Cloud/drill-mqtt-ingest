@@ -36,10 +36,10 @@ type Edge5ModbusV3Metric = {
   edge: string
   timestamp: string
   tag: string
-  value: number
+  value: number | null
 }
 
-function toFloatCDAB(reg0: number, reg1: number): number {
+function toFloatCDAB(reg0: number, reg1: number): number | null {
   const buf = Buffer.allocUnsafe(4)
   buf.writeUInt16BE(reg1, 0)
   buf.writeUInt16BE(reg0, 2)
@@ -63,16 +63,7 @@ function toMetrics(values: number[], timestamp: string): Edge5ModbusV3Metric[] {
 
   for (let i = 0; i < values.length; i += 2) {
     const tag = TAGS[i / 2]
-    const value = toFloatCDAB(values[i], values[i + 1])
-    if (isNaN(value)) {
-      if (CLOUD_INGEST_TAGS.has(tag)) {
-        log(
-          `edge5.modbus.v3: не удалось собрать число для ${tag}, ` +
-            `исходные values[${i}]=${values[i]}, values[${i + 1}]=${values[i + 1]}, пропуск`,
-        )
-      }
-      continue
-    }
+    const value = toFloatCDAB(values[i], values[i + 1]); // null is possible to send
 
     metrics.push({
       edge: EDGE,
