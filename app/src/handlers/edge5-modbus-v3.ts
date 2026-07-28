@@ -89,8 +89,13 @@ async function postMetrics(metrics: Edge5ModbusV3Metric[]): Promise<void> {
         throw new Error(text || `${response.status} ${response.statusText}`)
       }
 
-      void postDemoCloudIngest(metric); // для демо-системы
+      const demoResponse = await postDemoCloudIngest(metric); // для демо-системы
 
+      if (!demoResponse.ok) {
+        const text = await demoResponse.text()
+        throw new Error(text || `${demoResponse.status} ${demoResponse.statusText}`)
+      }
+      
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       errors.push(new Error(`${metric.tag}: ${message}`))
