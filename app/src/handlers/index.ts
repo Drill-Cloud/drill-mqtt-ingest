@@ -5,11 +5,14 @@ import { handleDemoModbus } from './demo-modbus.js';
 import { handleDemoVideo, handleDemoVideoV2 } from './demo-video.js';
 import { handleEdge5ModbusV2 } from './edge5-modbus-v2.js';
 import { handleEdge5ModbusV3 } from './edge5-modbus-v3.js';
+import { handleDevModbusV3 } from './dev-modbus-v3.js';
+
 import { handleEdge5Video } from './edge5-video.js';
 import { handleEdge5VideoV2 } from './edge5-video-v2.js';
 
 import { handle as interpretation } from './edge5i-modbus.js';
 import { handle as cdab} from './edge5cdab-modbus.js';
+
 
 const DEMO_PLC_TOPIC = 'data/demo/plc/v1';
 const DEMO_MODBUS_TOPIC = 'data/demo/modbus/v1';
@@ -28,3 +31,4 @@ register('data/edge5cdab/modbus', cdab);
 register('data/demo/video/v2/+', handleDemoVideoV2);
 register('data/edge5/video/v2/+', handleEdge5VideoV2);
 register('data/edge5/modbus/v3', handleEdge5ModbusV3);
+register('data/dev/modbus/v3', handleDevModbusV3);
