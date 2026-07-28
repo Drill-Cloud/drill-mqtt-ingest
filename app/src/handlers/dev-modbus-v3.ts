@@ -14,9 +14,9 @@ type OutputPayload = {
   timestamp: string
   tag: string
   value: number | null
-}[];
+};
 
-function inputToOutput(payload: InputPayload, timestamp: string): OutputPayload {
+function inputToOutput(payload: InputPayload, timestamp: string): OutputPayload[] {
   return Object.entries(payload).map(([tag, value]) => ({
     edge: EDGE,
     timestamp,
@@ -25,22 +25,24 @@ function inputToOutput(payload: InputPayload, timestamp: string): OutputPayload 
   }))
 }
 
-async function post(payload: OutputPayload): Promise<void> {
-  const response = await fetch(CLOUD_INGEST_URL, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': process.env.CLOUD_INGEST_API_KEY as string,
-    },
-    body: JSON.stringify(payload),
-  })
+async function post(payload: OutputPayload[]): Promise<void> {
+  for (const item of payload) {
+    const response = await fetch(CLOUD_INGEST_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': process.env.CLOUD_INGEST_API_KEY as string,
+      },
+      body: JSON.stringify(item),
+    })
 
-  if (!response.ok) {
-    const text = await response.text()
-    throw new Error(text)
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(text)
+    }
   }
 
-  log('dev.modbus.v3.posted', payload)
+  log('dev.modbus.v3.posted', { count: payload.length })
 }
 
 export const handleDevModbusV3: TopicHandler = async (topic, payload) => {
