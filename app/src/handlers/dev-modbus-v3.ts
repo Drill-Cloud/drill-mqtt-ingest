@@ -3,7 +3,7 @@ import { parseJson } from '../helpers/parse.js'
 import type { TopicHandler } from '../types.js'
 
 const EDGE = 'dev';
-const CLOUD_INGEST_URL = process.env.CLOUD_INGEST_URL as string;
+const CLOUD_INGEST_URL = process.env.DEMO_CLOUD_INGEST_URL as string;
 
 type InputPayload = {
   [tag: string]: number
