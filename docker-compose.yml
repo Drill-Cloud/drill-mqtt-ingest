@@ -24,7 +24,6 @@ services:
       CLOUD_INGEST_URL: ${CLOUD_INGEST_URL}
       CLOUD_INGEST_API_KEY: ${CLOUD_INGEST_API_KEY}
       DEMO_CLOUD_INGEST_URL: ${DEMO_CLOUD_INGEST_URL}
-      EDGE5_MODBUS_V2_MAPPING_FILE: ${EDGE5_MODBUS_V2_MAPPING_FILE:-/app/assets/edge5-modbus.json}
     networks:
       - default
       - proxy
