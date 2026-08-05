@@ -1,13 +1,17 @@
-import { spawn, type ChildProcess } from 'node:child_process'
-import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { spawn, type ChildProcess } from 'node:child_process';
+import { mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 
-import { log } from '../helpers/log.js'
+import { log } from '../helpers/log.js';
 
-const archiveDir = '/archive'
-const bucketSeconds = Number(process.env.ARCHIVE_BUCKET_SECONDS ?? 3600)
+const archiveDir = '/archive';
+const bucketSeconds = Number(process.env.ARCHIVE_BUCKET_SECONDS ?? 3600);
 
-const ffmpegByCamera = new Map<string, ChildProcess>()
+const IDLE_TIMEOUT_MS = 60_000;
+const IDLE_CHECK_INTERVAL_MS = 15_000;
+
+const ffmpegByCamera = new Map<string, ChildProcess>();
+const lastChunkAtByCamera = new Map<string, number>();
 
 function buildArgs(cameraDir: string): string[] {
   return [
@@ -35,40 +39,58 @@ function buildArgs(cameraDir: string): string[] {
   ]
 }
 
-function spawnFfmpeg(cameraId: string): ChildProcess {
-  const cameraDir = join(archiveDir, cameraId)
-  mkdirSync(cameraDir, { recursive: true })
+function spawnFFmpeg(cameraId: string): ChildProcess {
+  const cameraDir = join(archiveDir, cameraId);
+  mkdirSync(cameraDir, { recursive: true });
 
   const ffmpeg = spawn('ffmpeg', buildArgs(cameraDir), {
     stdio: ['pipe', 'ignore', 'pipe'],
   })
 
   ffmpeg.stderr!.on('data', (buffer: Buffer) => {
-    console.warn(`[ffmpeg ${cameraId}] ${buffer.toString().trim()}`)
+    console.warn(`[ffmpeg ${cameraId}] ${buffer.toString().trim()}`);
   })
 
   ffmpeg.on('error', (error) => {
-    console.error(`[ffmpeg ${cameraId}] spawn failed:`, error)
-    ffmpegByCamera.delete(cameraId)
+    console.error(`[ffmpeg ${cameraId}] spawn failed:`, error);
+    ffmpegByCamera.delete(cameraId);
   })
 
   ffmpeg.on('close', (code, signal) => {
-    log(`[ffmpeg ${cameraId}] stopped: code=${code}, signal=${signal}`)
-    ffmpegByCamera.delete(cameraId)
+    log(`[ffmpeg ${cameraId}] stopped: code=${code}, signal=${signal}`);
+    ffmpegByCamera.delete(cameraId);
   })
 
-  log(`[ffmpeg ${cameraId}] started, segment=${bucketSeconds}s, dir=${cameraDir}`)
-  return ffmpeg
+  log(`[ffmpeg ${cameraId}] started, segment=${bucketSeconds}s, dir=${cameraDir}`);
+  return ffmpeg;
 }
 
+function finalizeIdleArchivers(): void {
+  const now = Date.now()
+  for (const [cameraId, ffmpeg] of ffmpegByCamera) {
+    const lastChunkAt = lastChunkAtByCamera.get(cameraId) ?? 0
+    if (now - lastChunkAt <= IDLE_TIMEOUT_MS) continue
+
+    log(`[ffmpeg ${cameraId}] stream idle > ${IDLE_TIMEOUT_MS / 1000}s, finalizing segment`)
+    // отвязываем сразу: возобновившийся поток создаст новый процесс,
+    // пока старый дописывает сегмент и завершается
+    ffmpegByCamera.delete(cameraId);
+    lastChunkAtByCamera.delete(cameraId);
+    ffmpeg.stdin?.end();
+  }
+}
+
+setInterval(finalizeIdleArchivers, IDLE_CHECK_INTERVAL_MS)
+
 export function archiveChunk(cameraId: string, chunk: Buffer): void {
-  let ffmpeg = ffmpegByCamera.get(cameraId)
+  let ffmpeg = ffmpegByCamera.get(cameraId);
   if (!ffmpeg) {
-    ffmpeg = spawnFfmpeg(cameraId)
+    ffmpeg = spawnFFmpeg(cameraId);
     ffmpegByCamera.set(cameraId, ffmpeg)
   }
+  lastChunkAtByCamera.set(cameraId, Date.now());
   if (ffmpeg.stdin?.writable) {
-    ffmpeg.stdin.write(chunk)
+    ffmpeg.stdin.write(chunk);
   }
 }
 
@@ -76,9 +98,9 @@ export function shutdownArchiver(): Promise<void[]> {
   const closings = [...ffmpegByCamera.values()].map(
     (ffmpeg) =>
       new Promise<void>((resolve) => {
-        ffmpeg.once('close', () => resolve())
-        ffmpeg.stdin?.end()
+        ffmpeg.once('close', () => resolve());
+        ffmpeg.stdin?.end();
       }),
   )
-  return Promise.all(closings)
+  return Promise.all(closings);
 }
