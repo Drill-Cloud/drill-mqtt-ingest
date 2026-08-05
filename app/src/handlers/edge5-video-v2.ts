@@ -1,6 +1,7 @@
 import { log } from '../helpers/log.js'
 import { lastTopicSegment } from '../helpers/topic-match.js'
 import { broadcastChunk } from '../stream/edge-chunk-relay.js'
+import { archiveChunk } from '../stream/video-archiver.js'
 import type { TopicHandler } from '../types.js'
 
 const LOG_INTERVAL_MS = 10 * 60_000
@@ -105,7 +106,8 @@ export const handleEdge5VideoV2: TopicHandler = async (topic, payload) => {
     lastLogByCamera.set(cameraId, now)
   }
 
-  maybeLogTraffic(now)
+  maybeLogTraffic(now);
 
-  broadcastChunk(cameraId, payload)
+  broadcastChunk(cameraId, payload);
+  archiveChunk(cameraId, payload);
 }
