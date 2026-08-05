@@ -24,6 +24,9 @@ services:
       CLOUD_INGEST_URL: ${CLOUD_INGEST_URL}
       CLOUD_INGEST_API_KEY: ${CLOUD_INGEST_API_KEY}
       DEMO_CLOUD_INGEST_URL: ${DEMO_CLOUD_INGEST_URL}
+      ARCHIVE_BUCKET_SECONDS: ${ARCHIVE_BUCKET_SECONDS}
+    volumes:
+      - ./video-archive:/archive
     networks:
       - default
       - proxy

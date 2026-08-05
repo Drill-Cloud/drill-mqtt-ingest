@@ -34,7 +34,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 
 })
 
-export function onEdgeChunk(cameraId: string, chunk: Buffer): void {
+export function broadcastChunk(cameraId: string, chunk: Buffer): void {
   const clients = clientsByCamera.get(cameraId)
   if (!clients) return
   for (const client of clients) {

@@ -1,5 +1,5 @@
 import { log } from '../helpers/log.js'
-import { onEdgeChunk } from '../stream/edge-chunk-relay.js'
+import { broadcastChunk } from '../stream/edge-chunk-relay.js'
 import type { TopicHandler } from '../types.js'
 
 const LOG_INTERVAL_MS = 10_000
@@ -11,5 +11,6 @@ export const handleEdge5Video: TopicHandler = async (_topic, payload) => {
     log(`edge5.video ↑ ${payload.length}B`)
     lastLog = now
   }
-  onEdgeChunk('v1', payload);
+  
+  broadcastChunk('v1', payload);
 }
