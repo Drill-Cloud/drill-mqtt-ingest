@@ -4,7 +4,7 @@ import { broadcastChunk } from '../stream/edge-chunk-relay.js'
 import { archiveChunk } from '../stream/video-archiver.js'
 import type { TopicHandler } from '../types.js'
 
-const LOG_INTERVAL_MS = 10_000
+const LOG_INTERVAL_MS = 60_000;
 
 const lastLogByCamera = new Map<string, number>()
 
