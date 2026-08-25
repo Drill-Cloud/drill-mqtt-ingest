@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 export interface ReadySegment {
@@ -7,26 +7,25 @@ export interface ReadySegment {
   localPath: string
 }
 
-const MANIFEST_NAME = 'segments.csv'
-
-export function listReadySegments(archiveDir: string): ReadySegment[] {
+// Сегмент готов, если ffmpeg не писал в него дольше readyAfterMs:
+// в текущий сегмент чанки пишутся непрерывно, «остывший» файл финализирован.
+export function listReadySegments(archiveDir: string, readyAfterMs: number): ReadySegment[] {
   if (!existsSync(archiveDir)) return []
 
+  const now = Date.now()
   const segments: ReadySegment[] = []
 
-  for (const entry of readdirSync(archiveDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
+  for (const cameraEntry of readdirSync(archiveDir, { withFileTypes: true })) {
+    if (!cameraEntry.isDirectory()) continue
 
-    const cameraId = entry.name
-    const manifestPath = join(archiveDir, cameraId, MANIFEST_NAME)
-    if (!existsSync(manifestPath)) continue
+    const cameraId = cameraEntry.name
+    const cameraDir = join(archiveDir, cameraId)
 
-    for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
-      const fileName = line.split(',')[0]?.trim()
-      if (!fileName) continue
+    for (const fileName of readdirSync(cameraDir)) {
+      if (!fileName.endsWith('.ts')) continue
 
-      const localPath = join(archiveDir, cameraId, fileName)
-      if (existsSync(localPath)) {
+      const localPath = join(cameraDir, fileName)
+      if (now - statSync(localPath).mtimeMs > readyAfterMs) {
         segments.push({ cameraId, fileName, localPath })
       }
     }

@@ -30,10 +30,6 @@ function buildArgs(cameraDir: string): string[] {
     '-segment_atclocktime', '1',
     '-reset_timestamps', '1',
 
-    '-segment_list', join(cameraDir, 'segments.csv'),
-    '-segment_list_type', 'csv',
-    '-segment_list_size', '0',
-
     '-strftime', '1',
     join(cameraDir, '%Y-%m-%d_%H-%M-%S.ts'),
   ]

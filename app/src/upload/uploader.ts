@@ -46,7 +46,7 @@ async function scan(): Promise<void> {
   if (scanning) return
   scanning = true
   try {
-    const pending = listReadySegments(archiveDir).filter((segment) => {
+    const pending = listReadySegments(archiveDir, scanIntervalMs).filter((segment) => {
       const status = statusByPath.get(segment.localPath)
       return status !== 'UPLOADING' && status !== 'UPLOADED'
     })
@@ -75,6 +75,11 @@ export function startUploader(): void {
   }
 
   log(`uploader.started scanInterval=${scanIntervalMs / 1000}s remoteRoot=${remoteRoot}`)
+
+  const backlog = listReadySegments(archiveDir, scanIntervalMs)
+  const cameras = new Set(backlog.map((segment) => segment.cameraId)).size
+  log(`uploader.backlog cameras=${cameras} files=${backlog.length}`)
+
   void scan()
   setInterval(() => void scan(), scanIntervalMs)
 }
