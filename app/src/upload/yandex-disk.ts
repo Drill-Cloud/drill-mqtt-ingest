@@ -12,9 +12,11 @@ export async function ensureDir(remotePath: string): Promise<void> {
     `${API_BASE}/resources?path=${encodeURIComponent(remotePath)}`,
     { method: 'PUT', headers: authHeaders() },
   )
-  // 201 = created, 409 = already exists
-  if (response.status === 201 || response.status === 409) return
-  throw new Error(`mkdir "${remotePath}": ${response.status} ${await response.text()}`)
+  if (response.status === 201) return
+  const body = await response.text()
+  // 409 бывает трёх видов; успех — только "папка уже существует"
+  if (response.status === 409 && body.includes('DiskPathPointsToExistentDirectoryError')) return
+  throw new Error(`mkdir "${remotePath}": ${response.status} ${body}`)
 }
 
 export async function uploadFile(localPath: string, remotePath: string): Promise<void> {

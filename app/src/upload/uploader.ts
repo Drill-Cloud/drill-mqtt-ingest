@@ -11,7 +11,6 @@ const scanIntervalMs = Number(process.env.ARCHIVE_UPLOAD_SCAN_SECONDS ?? 30) * 1
 type UploadStatus = 'READY_LOCAL' | 'UPLOADING' | 'UPLOADED'
 
 const statusByPath = new Map<string, UploadStatus>()
-const ensuredRemoteDirs = new Set<string>()
 
 let scanning = false
 
@@ -23,10 +22,7 @@ function remoteDirFor(segment: ReadySegment): string {
 async function ensureRemoteDir(remoteDir: string): Promise<void> {
   const parts = remoteDir.split('/')
   for (let depth = 1; depth <= parts.length; depth++) {
-    const path = parts.slice(0, depth).join('/')
-    if (ensuredRemoteDirs.has(path)) continue
-    await ensureDir(path)
-    ensuredRemoteDirs.add(path)
+    await ensureDir(parts.slice(0, depth).join('/'))
   }
 }
 
