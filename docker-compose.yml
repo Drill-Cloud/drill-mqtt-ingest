@@ -4,6 +4,7 @@ services:
     container_name: mosquitto
     ports:
       - "1883:1883" # external MQTT port for receiving data
+      - "1884:1884" # external WebSocket port for receiving data
     volumes:
       - mosquitto_data:/mosquitto/data
     networks:
